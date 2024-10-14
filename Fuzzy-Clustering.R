@@ -105,23 +105,14 @@ label = iris[,5]
 # Define center initialization
 centers <- inaparc::kmpp(X, 3)$v
 
-# Calculate ARI using Euclidean distance for 1000 iterations
-ARI.F.Euclidean <- numeric(1000)
-for (i in 1:1000) {
+# Calculate ARI using Euclidean distance 
   result.Euclidean <- cmeans(X, iter.max = 100, centers = centers, method = "cmeans", m = 2, dist = "euclidean")
-  ARI.F.Euclidean[i] <- ARI.F(as.numeric(label), result.Euclidean$member)
-}
-ARIF.Euclidean <- max(ARI.F.Euclidean)
-FARI.Euclidean <- mean(ARI.F.Euclidean)
+  ARI.F(as.numeric(label), result.Euclidean$member)
+
 
 # ARI with Manhattan distance
-ARI.F.Manhattan <- numeric(1000)
-for (i in 1:1000) {
   result.Manhattan <- cmeans(X, iter.max = 100, centers = centers, method = "cmeans", m = 2, dist = "manhattan")
-  ARI.F.Manhattan[i] <- ARI.F(as.numeric(label), result.Manhattan$member)
-}
-ARIF.Manhattan <- max(ARI.F.Manhattan)
-FARI.Manhattan <- mean(ARI.F.Manhattan)
+  ARI.F(as.numeric(label), result.Manhattan$member)
 
 # Compute ARI for multiple q values using custom fuzzy C-Means
 ARI.F.results <- list()
@@ -130,25 +121,20 @@ k1_values <- c(1, 1, 1, 3, 2, 1, 3, 7, 3, 4, 9)
 k2_values <- c(9, 4, 3, 7, 3, 1, 2, 3, 1, 1, 1)
 
 for (q in seq_along(q_values)) {
-  ARI.F.results[[q]] <- numeric(1000)
   k1 <- k1_values[q]
   k2 <- k2_values[q]
   
-  for (i in 1:1000) {
-    result <- customFuzzyCMeans(X, centers = 3, m = 2, iter.max = 100, iterations = 1, threshold = 1e-09, k1, k2)
-    ARI.F.results[[q]][i] <- ARI.F(as.numeric(label), result$member)
-  }
+  # Run custom fuzzy C-Means with proper argument names for k1 and k2
+  result <- customFuzzyCMeans(X, centers = 3, m = 2, iter.max = 100, iterations = 1, threshold = 1e-09, k1 = k1, k2 = k2)
+  
+  # Compute ARI and store the result
+  ARI.F.results[[q]] <- ARI.F(as.numeric(label), result$member)
 }
 
-# Extract max and mean ARI values for each q
-ARIF.q <- sapply(ARI.F.results, max)
-FARI.q <- sapply(ARI.F.results, mean)
-
-# Plot results
-barplot_values <- c(ARIF.Euclidean, ARIF.Manhattan, ARIF.q)
-names <- c("Euclidean", "Manhattan", paste0("q=", q_values))
-bar_colors <- c("black", "grey25", rep("white", length(q_values)))
-
-barplot(matrix(barplot_values, nrow = 13, byrow = TRUE), beside = TRUE,  
-        main = "FARI of Iris", col = bar_colors, ylim = c(0, 0.95), cex.names = 0.6)
-legend("topleft", legend = c("C-means", "C-medians", "C-quantile"), cex = 0.7, fill = bar_colors, bty = "n")
+# Print ARI.F.results with corresponding q_values
+for (q in seq_along(q_values)) {
+  cat("q value:", q_values[q], "\n")
+  cat("ARI.F result:\n")
+  print(ARI.F.results[[q]])
+  cat("\n")  # Adds a blank line between each result for readability
+}
