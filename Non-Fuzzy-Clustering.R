@@ -254,17 +254,17 @@ k1 <- 1
 k2 <- 1
 
 # Run the custom K-Quantiles clustering with asymmetric distance
-result <- customKquantiles(X, k = 3, maxIter = 1000, totalIterations = 100, tolerance = 1e-6)
+result <- customKquantiles(X, k = 3, maxIter = 100, totalIterations = 10, tolerance = 1e-6)
 
 # Compute misclassification and ARI for q=0.5
 adjustedRandIndex(as.numeric(label), result$clusters)
 
 
 # Custom Manhattan Clustering
-basicManhattan <- basicKmedians(X, k = 3, maxIter = 1000, totalIterations = 1000, tolerance = 1e-6)
+basicManhattan <- basicKmedians(X, k = 3, maxIter = 100, totalIterations = 10, tolerance = 1e-6)
 adjustedRandIndex(as.numeric(label), basicManhattan$clusters)
 
 # Custom Euclidean Clustering 
-basicEuclidean <- basicKmeans(X, k = 3, maxIter = 1000, totalIterations = 100, tolerance = 1e-6)
+basicEuclidean <- basicKmeans(X, k = 3, maxIter = 1000, totalIterations = 10, tolerance = 1e-6)
 adjustedRandIndex(as.numeric(label), basicEuclidean$clusters)
 
